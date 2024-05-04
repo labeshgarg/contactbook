@@ -11,6 +11,31 @@ from storingInformation import read_contacts, write_contacts
 from utils import verifyMobile, verifyPinCode, verifyEmail, getContact
 
 FILE_LOCATION = "contacts.json"
+def updateContact(contacts):
+    firstName = input("Enter the first name of the contact to update: ").lower().strip()
+    lastName = input("Enter the last name of the contact to update: ").lower().strip()
+    contact = getContact(firstName, lastName, contacts)
+
+    if contact:
+        print("Existing contact found:")
+        print(getContactName(contact))
+        field = input("Which field would you like to update? (Mobile, Email_Address, Address, City, State, Pincode): ").strip()
+        newValue = input(f"Enter the new value for {field}: ").strip()
+
+        if field == "Mobile" and not verifyMobile(newValue):
+            print("Invalid mobile number, please check it again.")
+        elif field == "Email_Address" and not verifyEmail(newValue):
+            print("Invalid email address, please check it again.")
+        elif field == "Pincode" and not verifyPinCode(newValue):
+            print("Invalid pincode, please check it again.")
+        else:
+            if field in ["City", "State", "Pincode", "Street"]:
+                contact['Address'][field] = newValue
+            else:
+                contact[field] = newValue
+            print("Contact updated successfully.")
+    else:
+        print("No contact found with the given name.")
 
 # Function to ADD CONTACTS 
 def addContact(contacts):
@@ -93,13 +118,14 @@ def displayContact(contacts):
 # Displaying the operations.
 def main(path):
     print("****CONTACT LIST****")
-    print("The following operations are...")
+    print("The following operations are available:")
     print("\t1-|add|: Adding a contact.")
-    print("\t2-|search|: Searching a contact.")
+    print("\t2-|search|: Searching for a contact.")
     print("\t3-|delete|: Deleting a contact.")
     print("\t4-|display|: Displaying the contact list.")
-    print("\t5-|q|: Press q to quit and updates the contact list.")
-    
+    print("\t5-|update|: Updating a contact.")
+    print("\t6-|q|: Press q to quit and save the contact list.")
+
     contacts = read_contacts(path)
 
     while True:
@@ -113,12 +139,13 @@ def main(path):
         elif operation == "search":
             searchContact(contacts)   
         elif operation == "delete":
-            deleteContact(contacts)    
+            deleteContact(contacts)
         elif operation == "display":
-            displayContact(contacts) 
+            displayContact(contacts)
+        elif operation == "update":
+            updateContact(contacts)
         else:
-            print("Please enter the valid operation from the list given.")        
+            print("Please enter a valid operation from the list given.")        
 
-# Main Function
-if __name__ =="__main__":
+if __name__ == "__main__":
     main(FILE_LOCATION)
